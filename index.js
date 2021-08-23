@@ -6,36 +6,34 @@ const JsonSchema = mongoose.model("JsonSchema");
 
 //mongoose connection
 mongoose.connect(process.env.DATABASE, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
 });
 
 mongoose.connection
-	.on("open", () => {
-		console.log("Mongoose connection open");
-	})
-	.on("error", (err) => {
-		console.log(`Connection error: ${err.message}`);
-	});
+  .on("open", () => {
+    console.log("Mongoose connection open");
+  })
+  .on("error", (err) => {
+    console.log(`Connection error: ${err.message}`);
+  });
 
 // async await
 (async () => {
-	var rss = await parse("https://blog.ethereum.org/feed.xml");
+  var rss = await parse("https://blog.ethereum.org/feed.xml");
 
-	// console.log(JSON.stringify(rss, null, 3));
+  // console.log(JSON.stringify(rss, null, 3));
 })();
 // Promise
 
 parse("https://blog.ethereum.org/feed.xml").then((rss) => {
-	// console.log(JSON.stringify(rss, null, 3));
-	var jsonSchema = new JsonSchema(JSON.stringify(rss, null, 3));
+  // console.log(JSON.stringify(rss, null, 3));
+  var jsonSchema = new JsonSchema(JSON.stringify(rss, null, 3));
 
-	JsonSchema.insert()
-		.then(() => {
-			res.send("Json records saved to Database");
-		})
-		.catch((err) => {
-			console.log(err);
-			res.send("Sorry! Something went wrong records not saved.");
-		});
+  // JsonSchema.insert()
+  db.collection.save(jsonSchema).then(() => {
+    res.send("Json records saved to Database");
+  });
 });
