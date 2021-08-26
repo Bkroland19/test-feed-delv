@@ -8,6 +8,8 @@ const JsonSchema = mongoose.model("JsonSchema");
 mongoose.connect(process.env.DATABASE, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false,
 });
 
 mongoose.connection
@@ -18,24 +20,32 @@ mongoose.connection
 		console.log(`Connection error: ${err.message}`);
 	});
 
+//
+
 // async await
 (async () => {
-	var rss = await parse("https://blog.ethereum.org/feed.xml");
-
-	// console.log(JSON.stringify(rss, null, 3));
+	// var rss = await parse("https://blog.ethereum.org/feed.xml");
 })();
 // Promise
+const links = [
+	"https://blog.ethereum.org/feed.xml",
+	"https://careeralley.com/feed/",
+];
 
-parse("https://blog.ethereum.org/feed.xml").then((rss) => {
-	// console.log(JSON.stringify(rss, null, 3));
-	var jsonSchema = new JsonSchema(JSON.stringify(rss, null, 3));
-
-	JsonSchema.insert()
-		.then(() => {
-			res.send("Json records saved to Database");
-		})
-		.catch((err) => {
-			console.log(err);
-			res.send("Sorry! Something went wrong records not saved.");
-		});
+links.map((link) => {
+	parse(link).then(async (rss) => {
+		// console.log(JSON.stringify(link, null, 3));
+		var rss = await parse(link);
+		console.log(rss);
+		// link.items?.map((object) => {
+		// 	var jsonSchema = new JsonSchema(object);
+		// 	jsonSchema.save();
+		// 	return "data sent to the db";
+		// });
+		//console.log(link.items);
+		// // JsonSchema.insert()
+		// jsonSchema.save().then(() => {
+		// 	res.send("Json records saved to Database");
+		// });
+	});
 });
